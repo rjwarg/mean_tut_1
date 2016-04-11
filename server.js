@@ -28,15 +28,26 @@ app.delete('/contactlist/:id', function(req,res){
     var id = req.params.id;
     console.log('remove: ' + id);
     db.contactlist.remove({_id: mongojs.ObjectId(id)}, function(err,doc){
-        res.json(doc);
+        if(doc) {
+            console.log('remove with objectid ' + doc);
+            res.json(doc);
+        }
+        else{
+            db.contactlist.remove({_id: id}, function(err,doc){
+                console.log('remove with string id ' + doc);
+                res.json(doc);
+            });
+        }
     });
 
 });
 
 app.get('/contactlist/:id', function(req,res) {
-    console.log('I received an edit request');
+    console.log('I received an edit(get) request');
     var id = req.params.id;
+    console.log('editing id = ' + id);
     db.contactlist.findOne({_id: mongojs.ObjectId(id)},function (err, doc) {
+        console.log('Error ' + err);
 
         console.log(doc);
         res.json(doc);
@@ -44,8 +55,10 @@ app.get('/contactlist/:id', function(req,res) {
 });
 
 app.put('/contactlist/:id', function(req,res) {
-    console.log('I received an edit request');
+
     var id = req.params.id;
+    console.log('I received a new edit(put) request');
+    console.log('editing id = ' + id);
     db.contactlist.findAndModify({query: {_id: mongojs.ObjectId(id)},
         update: {$set: {name: req.body.name, email: req.body.email, number: req.body.number}},
         new: true}, function(err, doc){

@@ -17,18 +17,26 @@ myApp.controller('AppCtrl',['$scope','$http', function ($scope,$http){
     refresh();
     $scope.addContact = function(){
         console.log($scope.contact);
+        // make sure the contact is not empty
+        if($scope.contact.name ){
+        // make sure the _id is empty
+        $scope.contact._id = "";
         $http.post('/contactlist', $scope.contact).success(function(response){
             console.log(response);
             refresh();
-        });
+        })}
+        else{
+            alert("The name must not be empty");
+        }
     };
 
     $scope.remove = function(id){
         console.log("remove id = " + id);
+        if(confirm("Continue to delete This contact?")){
         $http.delete('/contactlist/' +id).success(function(response){
             console.log(response);
             refresh();
-        })
+        })};
     };
 
     $scope.edit = function(id) {
@@ -36,14 +44,21 @@ myApp.controller('AppCtrl',['$scope','$http', function ($scope,$http){
         $http.get('/contactlist/' + id).success(function (response) {
             console.log(response);
             $scope.contact = response;
+            $scope.editing = true;
         });
     };
 
     $scope.update = function(){
         console.log($scope.contact._id);
         $http.put('/contactlist/' +$scope.contact._id, $scope.contact).success(function(response){
+            $scope.editing = false;
             refresh();
         })
-    }
+    };
+
+    $scope.cancel = function(){
+        $scope.editing= false;
+        refresh();
+    };
 
    }]);
